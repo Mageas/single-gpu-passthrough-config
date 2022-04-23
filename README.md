@@ -570,12 +570,12 @@ Install Apps
 choco install -y geforce-experience discord steam firefox
 ```
 
-Optimizer
+[Optimizer](https://github.com/hellzerg/optimizer)
 ```
 https://github.com/hellzerg/optimizer
 ```
 
-Windows 10 Activator
+[Windows 10 Activator](https://github.com/vishalnagda1/windows-10-activator)
 ```bat
 @echo off
 title Activate Windows 10 ALL versions for FREE!&cls&echo ============================================================================&echo #Project: Activating Microsoft software products for FREE without software&echo ============================================================================&echo.&echo #Supported products:&echo - Windows 10 Home&echo - Windows 10 Home N&echo - Windows 10 Home Single Language&echo - Windows 10 Home Country Specific&echo - Windows 10 Professional&echo - Windows 10 Professional N&echo - Windows 10 Education&echo - Windows 10 Education N&echo - Windows 10 Enterprise&echo - Windows 10 Enterprise N&echo - Windows 10 Enterprise LTSB&echo - Windows 10 Enterprise LTSB N&echo.&echo.&echo ============================================================================&echo Activating your Windows...&cscript //nologo slmgr.vbs /ckms >nul&cscript //nologo slmgr.vbs /upk >nul&cscript //nologo slmgr.vbs /cpky >nul&set i=1&wmic os | findstr /I "enterprise" >nul
@@ -595,7 +595,4 @@ explorer "http://MSGuides.com"&goto halt
 echo ============================================================================&echo.&echo Sorry! Your version is not supported.&echo.
 :halt
 pause >nul
-```
-```
-https://github.com/vishalnagda1/windows-10-activator
 ```
