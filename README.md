@@ -1,4 +1,4 @@
-# VFIO Single GUP Passthrough Config
+# Single GUP Passthrough Config
 
 This is my personal config, for a tutorial, you can read [this](https://gitlab.com/Mageas/vfio-single-gup-passthrough).
 
