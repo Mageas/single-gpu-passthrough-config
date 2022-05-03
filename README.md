@@ -5,24 +5,25 @@ This is my personal config, for a tutorial, you can read [this](https://gitlab.c
 ### **Virt Hardware**
 
 | **Remove**      |
-|:----------------|
+| :-------------- |
 | `Display spice` |
 | `Channel spice` |
 | `Video QXL`     |
 | `Sound ich*`    |
 | `Serial 1`      |
 
-| **Add PCI**                     |
-|:--------------------------------|
-| `0000:04:00:0` *NVMe*           |
-| `0000:0A:00:0` *RTX 2070 Super* |
-| `0000:0A:00:1` *RTX 2070 Super* |
-| `0000:0A:00:2` *RTX 2070 Super* |
-| `0000:0A:00:3` *RTX 2070 Super* |
-| `0000:05:00:0` *USB Controller* |
+| **Add PCI**                       |
+| :-------------------------------- |
+| `0000:04:00:0` *NVMe*             |
+| `0000:0A:00:0` *RTX 2070 Super*   |
+| `0000:0A:00:1` *RTX 2070 Super*   |
+| `0000:0A:00:2` *RTX 2070 Super*   |
+| `0000:0A:00:3` *RTX 2070 Super*   |
+| `0000:0C:00:4` *Audio Controller* |
+| `0000:05:00:0` *USB Controller*   |
 
 | **Add USB**                   |
-|:------------------------------|
+| :---------------------------- |
 | `009:002` *Logitech G PRO*    |
 | `009:003` *PnP Audio Device*  |
 | `009:004` *Microdia Keyboard* |
