@@ -33,6 +33,35 @@ This is my personal config, for a tutorial, you can read [this](https://gitlab.c
   - Model: *CRB*
   - Version: *2.0*
 
+### **Config Libvirt**
+
+<table>
+<tr>
+<th>
+/etc/libvirt/qemu.conf
+</th>
+</tr>
+
+<tr>
+<td>
+
+```conf
+...
+user = "mageas"
+group = "wheel"
+...
+```
+
+</td>
+</tr>
+</table>
+
+| /etc/libvirt/libvirtd.conf    |
+| ----------------------------- |
+| `unix_sock_group = "libvirt"` |
+| `unix_sock_rw_perms = "0770"` |
+
+
 ### **Config Libvirt Hooks**
 
 <table>
@@ -176,70 +205,6 @@ systemctl start lightdm.service
   </table>
 </details>
 
-### **Audio Passthrough**
-
-<table>
-<tr>
-<th>
-/etc/libvirt/qemu.conf
-</th>
-</tr>
-
-<tr>
-<td>
-
-```conf
-...
-user = "mageas"
-group = "wheel"
-...
-```
-
-</td>
-</tr>
-</table>
-
-<table>
-<tr>
-<th>
-XML
-</th>
-</tr>
-
-<tr>
-<td>
-
-```xml
-<domain type='kvm' xmlns:qemu='http://libvirt.org/schemas/domain/qemu/1.0'>
-```
-
-</td>
-</tr>
-</table>
-
-<table>
-<tr>
-<th>
-XML
-</th>
-</tr>
-
-<tr>
-<td>
-
-```xml
-...
-  <qemu:commandline>
-    <qemu:arg value="-audiodev"/>
-    <qemu:arg value="pa,id=hda,server=/run/user/1000/pulse/native"/>
-  </qemu:commandline>
-</domain>
-```
-
-</td>
-</tr>
-</table>
-
 ### **Video card driver virtualisation detection**
 
 <table>
@@ -370,6 +335,24 @@ XML
 </table>
 
 ### **Hyper-V Enlightenments**
+
+<table>
+<tr>
+<th>
+XML
+</th>
+</tr>
+
+<tr>
+<td>
+
+```xml
+<domain type='kvm' xmlns:qemu='http://libvirt.org/schemas/domain/qemu/1.0'>
+```
+
+</td>
+</tr>
+</table>
 
 <table>
 <tr>
