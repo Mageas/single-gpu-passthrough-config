@@ -2,38 +2,16 @@
 
 This is my personal config, for a tutorial, you can read [this](https://gitlab.com/Mageas/vfio-single-gup-passthrough).
 
-### **Virt Hardware**
+### **Setup Libvirt**
 
-| **Remove**      |
-| :-------------- |
-| `Display spice` |
-| `Channel spice` |
-| `Video QXL`     |
-| `Sound ich*`    |
-| `Serial 1`      |
+| /etc/default/grub                                          |
+| ---------------------------------------------------------- |
+| GRUB_CMDLINE_LINUX_DEFAULT="... amd_iommu=on iommu=pt ..." |
+| /etc/libvirt/libvirtd.conf    |
 
-| **Add PCI**                       |
-| :-------------------------------- |
-| `0000:04:00:0` *NVMe*             |
-| `0000:0A:00:0` *RTX 2070 Super*   |
-| `0000:0A:00:1` *RTX 2070 Super*   |
-| `0000:0A:00:2` *RTX 2070 Super*   |
-| `0000:0A:00:3` *RTX 2070 Super*   |
-| `0000:0C:00:4` *Audio Controller* |
-| `0000:05:00:0` *USB Controller*   |
-
-| **Add USB**                   |
-| :---------------------------- |
-| `009:002` *Logitech G PRO*    |
-| `009:003` *PnP Audio Device*  |
-| `009:004` *Microdia Keyboard* |
-
-**Add TPM:**
-  - Type: *Emulated*
-  - Model: *CRB*
-  - Version: *2.0*
-
-### **Config Libvirt**
+| ----------------------------- |
+| `unix_sock_group = "libvirt"` |
+| `unix_sock_rw_perms = "0770"` |
 
 <table>
 <tr>
@@ -56,11 +34,36 @@ group = "wheel"
 </tr>
 </table>
 
-| /etc/libvirt/libvirtd.conf    |
-| ----------------------------- |
-| `unix_sock_group = "libvirt"` |
-| `unix_sock_rw_perms = "0770"` |
+### **Virt Hardware**
 
+| **Remove**      |
+| :-------------- |
+| `Display spice` |
+| `Channel spice` |
+| `Video QXL`     |
+| `Sound ich*`    |
+| `Serial 1`      |
+
+`Display Spice` is important to be deleted *(Delete all the references of spice in the XML)*.
+
+| **Add PCI**                       |
+| :-------------------------------- |
+| `0000:04:00:0` *NVMe*             |
+| `0000:0c:00:0` *RX 6900 XT*       |
+| `0000:0c:00:1` *RX 6900 XT*       |
+| `0000:0C:00:4` *Audio Controller* |
+| `0000:05:00:0` *USB Controller*   |
+
+| **Add USB**         |
+| :------------------ |
+| *Logitech G PRO*    |
+| *PnP Audio Device*  |
+| *Microdia Keyboard* |
+
+**Add TPM:**
+  - Type: *Emulated*
+  - Model: *CRB*
+  - Version: *2.0*
 
 ### **Config Libvirt Hooks**
 
@@ -79,10 +82,7 @@ group = "wheel"
 VM_MEMORY=13312
 
 # VIRSH
-VIRSH_GPU_VIDEO=pci_0000_09_00_0
-VIRSH_GPU_AUDIO=pci_0000_09_00_1
-VIRSH_USB=pci_0000_09_00_2
-VIRSH_SERIAL_BUS=pci_0000_09_00_3
+VIRSH_GPU=pci_0000_0c_00_0
 VIRSH_NVME_SSD=pci_0000_04_00_0
 ```
 
@@ -107,40 +107,39 @@ VIRSH_NVME_SSD=pci_0000_04_00_0
 
 ```sh
 #!/bin/bash
-# Helpful to read output when debugging
 set -x
 
-# Load variables
+# load variables
 source "/etc/libvirt/hooks/kvm.conf"
 
 # Stop display manager
-systemctl stop lightdm.service
+systemctl stop sddm.service
 
 # Unbind VTconsoles
 echo 0 > /sys/class/vtconsole/vtcon0/bind
 echo 0 > /sys/class/vtconsole/vtcon1/bind
 
-# Unbind EFI-Framebuffer
+# Unbind EFI Framebuffer
 echo efi-framebuffer.0 > /sys/bus/platform/drivers/efi-framebuffer/unbind
 
-# Avoid a Race condition
+# Avoid a race condition by waiting a couple of seconds. This can be calibrated to be shorter or longer if required for your system
 sleep 5
 
-# Unload all Nvidia drivers
-modprobe -r nvidia_drm
-modprobe -r nvidia_modeset
-modprobe -r nvidia_uvm
-modprobe -r nvidia
+# Unload AMD kernel module
+modprobe -r drm_kms_helper
+modprobe -r amdgpu
+modprobe -r radeon
+modprobe -r drm
 
-# Unbind the GPU from display driver
+
+# Detach GPU devices from host
 virsh nodedev-detach $VIRSH_GPU_VIDEO
 virsh nodedev-detach $VIRSH_GPU_AUDIO
-virsh nodedev-detach $VIRSH_USB
-virsh nodedev-detach $VIRSH_SERIAL_BUS
-virsh nodedev-detach $VIRSH_NVME_SSD
 
-# Load VFIO Kernel Module  
-modprobe vfio-pci 
+# Load vfio module
+modprobe vfio
+modprobe vfio_pci
+modprobe vfio_iommu_type1
 ```
 
   </td>
@@ -165,39 +164,37 @@ modprobe vfio-pci
 #!/bin/bash
 set -x
 
-# Load variables
+# load variables
 source "/etc/libvirt/hooks/kvm.conf"
 
-# Unload VFIO-PCI Kernel Driver
-modprobe -r vfio-pci
+# Unload all the vfio modules
+modprobe -r vfio_pci
 modprobe -r vfio_iommu_type1
 modprobe -r vfio
 
-# Re-Bind GPU to Nvidia Driver
+# Attach GPU devices to host
+# Use your GPU and HDMI Audio PCI host device
 virsh nodedev-reattach $VIRSH_GPU_VIDEO
 virsh nodedev-reattach $VIRSH_GPU_AUDIO
-virsh nodedev-reattach $VIRSH_USB
-virsh nodedev-reattach $VIRSH_SERIAL_BUS
-virsh nodedev-reattach $VIRSH_NVME_SSD
 
-# Rebind VT consoles
+# Rebind VTconsoles
 echo 1 > /sys/class/vtconsole/vtcon0/bind
 echo 1 > /sys/class/vtconsole/vtcon1/bind
 
-# Bind EFI-Framebuffer
-nvidia-xconfig --query-gpu-info > /dev/null 2>&1
+# Rebind framebuffer to host
 echo "efi-framebuffer.0" > /sys/bus/platform/drivers/efi-framebuffer/bind
 
-# Load all Nvidia drivers
-modprobe nvidia_drm
-modprobe nvidia_modeset
-modprobe drm_kms_helper
-modprobe drm
-modprobe nvidia_uvm
-modprobe nvidia
+# Load AMD kernel module
+modprobe  amdgpu
+modprobe  gpu_sched
+modprobe  ttm
+modprobe  drm_kms_helper
+modprobe  i2c_algo_bit
+modprobe  drm
+modprobe  snd_hda_intel
 
 # Restart Display Manager
-systemctl start lightdm.service
+systemctl start sddm.service
 ```
 
   </td>
@@ -231,34 +228,6 @@ XML
   <ioapic driver="kvm"/>
   ...
 </features>
-...
-```
-
-</td>
-</tr>
-</table>
-
-### **vBIOS Patching**
-
-<table>
-<tr>
-<th>
-XML
-</th>
-</tr>
-
-<tr>
-<td>
-
-```xml
-...
-<hostdev mode='subsystem' type='pci' managed='yes'>
-  <source>
-    ...
-  </source>
-  <rom file="/home/mageas/.local/kvm/patched-vbios.rom"/>
-  ...
-</hostdev>
 ...
 ```
 
