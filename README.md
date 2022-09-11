@@ -7,8 +7,8 @@ This is my personal config, for a tutorial, you can read [this](https://gitlab.c
 | /etc/default/grub                                          |
 | ---------------------------------------------------------- |
 | GRUB_CMDLINE_LINUX_DEFAULT="... amd_iommu=on iommu=pt ..." |
-| /etc/libvirt/libvirtd.conf    |
 
+| /etc/libvirt/libvirtd.conf    |
 | ----------------------------- |
 | `unix_sock_group = "libvirt"` |
 | `unix_sock_rw_perms = "0770"` |
