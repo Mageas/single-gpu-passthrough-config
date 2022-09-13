@@ -79,7 +79,7 @@ group = "wheel"
 
 ```conf
 # CONFIG
-VM_MEMORY=13312
+VM_MEMORY=32768
 
 # VIRSH
 VIRSH_GPU=pci_0000_0c_00_0
@@ -436,8 +436,8 @@ XML
 
 ```xml
 ...
-  <memory unit="KiB">13631488</memory>
-  <currentMemory unit="KiB">13631488</currentMemory>
+  <memory unit="KiB">33554432</memory>
+  <currentMemory unit="KiB">33554432</currentMemory>
   <memoryBacking>
     <hugepages/>
   </memoryBacking>
